@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2F6B2F">
+<meta name="description" content="Kisan Saathi – farming knowledge, fruit and vegetable nutrition, and direct contact with farmers, delivery partners and farm shops. In Hindi, English, Marathi, Telugu and Tamil, with voice and spoken questions.">
+<title>Kisan Saathi – किसान साथी</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hind:wght@400;600;700&family=Hind+Guntur:wght@400;600;700&family=Hind+Madurai:wght@400;600;700&family=Tiro+Devanagari+Hindi&family=Tiro+Devanagari+Marathi&family=Tiro+Tamil&family=Tiro+Telugu&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ First screens: choose language, then Read or Voice ============ -->
+<div class="start" id="start" hidden>
+  <div class="start-in">
+    <div id="step-lang">
+      <p class="start-brand">किसान साथी<span>Kisan Saathi</span></p>
+      <p class="start-q">भाषा चुनें<br>Choose your language</p>
+      <div class="plates" id="plates"></div>
+    </div>
+    <div id="step-mode" hidden>
+      <p class="start-brand small" data-i="brand"></p>
+      <p class="start-q" data-i="chooseMode"></p>
+      <div class="modes">
+        <button type="button" class="mode-card" data-mode="read">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M6 10c6-2 12-2 18 2v28c-6-4-12-4-18-2z"/><path d="M42 10c-6-2-12-2-18 2v28c6-4 12-4 18-2z"/></svg>
+          <b data-i="modeRead"></b><span data-i="modeReadDesc"></span>
+        </button>
+        <button type="button" class="mode-card" data-mode="voice">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 18v12h8l10 8V10l-10 8z"/><path d="M32 17a10 10 0 0 1 0 14M37 12a17 17 0 0 1 0 24"/></svg>
+          <b data-i="modeVoice"></b><span data-i="modeVoiceDesc"></span>
+        </button>
+      </div>
+      <button type="button" class="linkbtn" id="mode-back" data-i="backLang"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Top bar ============ -->
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand"><b data-i="brand"></b><small data-i="tagline"></small></div>
+    <div class="top-actions">
+      <button type="button" class="hbtn" id="btn-lang"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg><span id="lang-short"></span></button>
+      <button type="button" class="hbtn" id="btn-mode"></button>
+      <button type="button" class="hbtn" id="btn-account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span id="acct-label"></span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <p class="banner" id="offline-banner" data-i="offline" hidden></p>
+
+  <!-- ============ 1. Kheti Gyan ============ -->
+  <section class="sec" id="s-kheti" aria-labelledby="h-kheti">
+    <div class="sec-head">
+      <h1 id="h-kheti" data-i="khetiTitle"></h1>
+      <p data-i="khetiIntro"></p>
+      <div class="sec-listen" data-listen="kheti"></div>
+    </div>
+    <div class="seg" role="tablist">
+      <button type="button" role="tab" data-ksub="topics" data-i="khetiTopics"></button>
+      <button type="button" role="tab" data-ksub="methods" data-i="khetiMethods"></button>
+    </div>
+
+    <div id="kheti-topics">
+      <div class="topics" id="topics"></div>
+      <article class="article" id="article" tabindex="-1"></article>
+    </div>
+
+    <div id="kheti-methods" hidden>
+      <p class="methods-intro" id="methods-intro"></p>
+      <div id="methods-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ 2. Fruits & Vegetables (with Nutrient Finder) ============ -->
+  <section class="sec" id="s-food" aria-labelledby="h-food" hidden>
+    <div class="sec-head">
+      <h1 id="h-food" data-i="foodTitle"></h1>
+      <p data-i="foodIntro"></p>
+      <div class="sec-listen" data-listen="food"></div>
+    </div>
+    <div class="seg" role="tablist">
+      <button type="button" role="tab" data-sub="foods" data-i="subFoods"></button>
+      <button type="button" role="tab" data-sub="finder" data-i="subFinder"></button>
+    </div>
+
+    <div id="food-foods">
+      <div class="searchbar" id="sb-food"></div>
+      <h2 class="group-h" id="h-fruits"></h2>
+      <div class="foods" id="list-fruits"></div>
+      <h2 class="group-h" id="h-veg"></h2>
+      <div class="foods" id="list-veg"></div>
+      <p class="empty" id="food-none" hidden></p>
+    </div>
+
+    <div id="food-finder" hidden>
+      <p class="label" data-i="finderPick"></p>
+      <div class="nchips" id="nchips"></div>
+      <div class="seg small" id="finder-filter"></div>
+      <div id="finder-out"></div>
+    </div>
+    <p class="source" data-i="source"></p>
+  </section>
+
+  <!-- ============ 3. Farmers ============ -->
+  <section class="sec" id="s-farmers" aria-labelledby="h-farmers" hidden>
+    <div class="sec-head">
+      <h1 id="h-farmers" data-i="farmersTitle"></h1>
+      <p data-i="farmersIntro"></p>
+      <div class="sec-listen" data-listen="farmers"></div>
+    </div>
+    <button type="button" class="btn primary wide" id="add-farmer"></button>
+    <div class="searchbar" id="sb-farmers"></div>
+    <select class="filter" id="f-method" aria-label="method"></select>
+    <div class="cards" id="list-farmers"></div>
+  </section>
+
+  <!-- ============ 4. Delivery ============ -->
+  <section class="sec" id="s-delivery" aria-labelledby="h-delivery" hidden>
+    <div class="sec-head">
+      <h1 id="h-delivery" data-i="deliveryTitle"></h1>
+      <p data-i="deliveryIntro"></p>
+      <div class="sec-listen" data-listen="delivery"></div>
+    </div>
+    <div class="how">
+      <h2 data-i="howTitle"></h2>
+      <ol><li data-i="how1"></li><li data-i="how2"></li><li data-i="how3"></li></ol>
+    </div>
+    <button type="button" class="btn primary wide" id="add-delivery"></button>
+    <div class="searchbar" id="sb-delivery"></div>
+    <div class="cards" id="list-delivery"></div>
+  </section>
+
+  <!-- ============ 5. Shop ============ -->
+  <section class="sec" id="s-shop" aria-labelledby="h-shop" hidden>
+    <div class="sec-head">
+      <h1 id="h-shop" data-i="shopTitle"></h1>
+      <p data-i="shopIntro"></p>
+      <div class="sec-listen" data-listen="shop"></div>
+    </div>
+    <button type="button" class="btn primary wide" id="add-shop"></button>
+    <div class="catchips" id="catchips"></div>
+    <div class="searchbar" id="sb-shop"></div>
+    <div class="cards" id="list-shop"></div>
+  </section>
+</main>
+
+<!-- ============ Bottom menu ============ -->
+<nav class="tabs" aria-label="menu">
+  <div class="wrap tabs-in" role="tablist">
+    <button type="button" class="tab" role="tab" data-tab="kheti">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V10"/><path d="M12 10c0-4 2.5-6.5 6.5-6.5 0 4-2.5 6.5-6.5 6.5zM12 14c0-3.5-2.2-5.5-5.5-5.5 0 3.5 2.2 5.5 5.5 5.5z"/><path d="M5 21h14"/></svg>
+      <span data-i="tKheti"></span></button>
+    <button type="button" class="tab" role="tab" data-tab="food">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7c-3-2-8-1-8 5 0 5 3 9 6 9 1 0 1.3-.5 2-.5s1 .5 2 .5c3 0 6-4 6-9 0-6-5-7-8-5z"/><path d="M12 7c0-2 1-4 3-4"/></svg>
+      <span data-i="tFood"></span></button>
+    <button type="button" class="tab" role="tab" data-tab="farmers">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14"/><path d="M7 9c0-3 2-5 5-5s5 2 5 5"/><circle cx="12" cy="12" r="3"/><path d="M5 21c1-3.5 3.8-5.5 7-5.5s6 2 7 5.5"/></svg>
+      <span data-i="tFarmers"></span></button>
+    <button type="button" class="tab" role="tab" data-tab="delivery">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h11v10H2zM13 10h4l4 3v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
+      <span data-i="tDelivery"></span></button>
+    <button type="button" class="tab" role="tab" data-tab="shop">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9h18c0 2-1.5 3-3 3s-3-1-3-3c0 2-1.5 3-3 3S9 11 9 9c0 2-1.5 3-3 3S3 11 3 9z"/><path d="M5 12v9h14v-9M10 21v-5h4v5"/></svg>
+      <span data-i="tShop"></span></button>
+  </div>
+</nav>
+
+<!-- Ask by voice: answers come only from this website's own content -->
+<button type="button" class="askfab" id="ask-open">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+  <span data-i="askBtn"></span>
+</button>
+<button type="button" class="stopfab" id="stop-speak" hidden></button>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- One pop-up window, reused for details, login and forms -->
+<dialog class="dlg" id="dlg" aria-labelledby="dlg-title">
+  <div class="dlg-bar">
+    <h2 id="dlg-title"></h2>
+    <button type="button" class="xbtn" id="dlg-close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="dlg-body" id="dlg-body"></div>
+</dialog>
+
+<!-- Firebase (online database + login). If the internet is off, the farming and food sections still work. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<!-- Our code -->
+<script src="js/i18n.js"></script>
+<script src="js/kheti.js"></script>
+<script src="js/foods.js"></script>
+<script src="js/methods.js"></script>
+<script src="js/ask.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/store.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

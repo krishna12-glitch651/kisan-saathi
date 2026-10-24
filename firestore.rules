@@ -1,0 +1,109 @@
+rules_version = '2';
+
+// Kisan Saathi database security rules.
+// The website can only do what these rules allow, even if someone changes the page code.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function hasProfile() {
+      return signedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function shortText(v, n) { return v is string && v.size() <= n; }
+    function filledText(v, n) { return v is string && v.size() > 0 && v.size() <= n; }
+    function okPhone(p) { return p is string && p.matches('^[6-9][0-9]{9}$'); }
+    function place(d) {
+      return filledText(d.name, 60) && filledText(d.village, 80) && filledText(d.district, 60) && filledText(d.state, 60);
+    }
+
+    // ---------- private profile: only the owner can see or change it ----------
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['name', 'phone', 'role', 'village', 'district', 'state', 'updatedAt'])
+        && place(request.resource.data)
+        && okPhone(request.resource.data.phone)
+        && request.resource.data.role in ['consumer', 'farmer', 'shop', 'delivery']
+        && request.resource.data.updatedAt is number;
+    }
+
+    // ---------- phone numbers ----------
+    // One number at a time, only for logged-in users who filled their own profile.
+    // Downloading the whole list of numbers is blocked.
+    match /contacts/{uid} {
+      allow get: if hasProfile();
+      allow list: if false;
+      allow delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && request.resource.data.keys().hasOnly(['name', 'phone', 'updatedAt'])
+        && filledText(request.resource.data.name, 60)
+        && okPhone(request.resource.data.phone);
+    }
+
+    // ---------- farmers: anyone can see (no phone numbers here), only that farmer can change ----------
+    match /farmers/{uid} {
+      allow read: if true;
+      allow delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && myRole() == 'farmer'
+        && request.resource.data.keys().hasOnly(['name', 'village', 'district', 'state', 'crops', 'method', 'inputs', 'about', 'visit', 'produce', 'thumb', 'photoCount', 'updatedAt'])
+        && place(request.resource.data)
+        && request.resource.data.crops is list
+        && request.resource.data.crops.size() >= 1 && request.resource.data.crops.size() <= 20
+        && request.resource.data.method in ['organic', 'natural', 'mixed', 'chemical']
+        && shortText(request.resource.data.inputs, 300)
+        && shortText(request.resource.data.about, 500)
+        && request.resource.data.visit is bool
+        && request.resource.data.produce is list && request.resource.data.produce.size() <= 15
+        && shortText(request.resource.data.thumb, 60000)
+        && request.resource.data.photoCount is int
+        && request.resource.data.photoCount >= 0 && request.resource.data.photoCount <= 4
+        && request.resource.data.updatedAt is number;
+    }
+
+    match /farmPhotos/{uid} {
+      allow read: if true;
+      allow delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && myRole() == 'farmer'
+        && request.resource.data.keys().hasOnly(['photos', 'updatedAt'])
+        && request.resource.data.photos is list && request.resource.data.photos.size() <= 4;
+    }
+
+    // ---------- delivery partners ----------
+    match /delivery/{uid} {
+      allow read: if true;
+      allow delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && myRole() == 'delivery'
+        && request.resource.data.keys().hasOnly(['name', 'village', 'district', 'state', 'vehicle', 'areas', 'charges', 'available', 'updatedAt'])
+        && place(request.resource.data)
+        && request.resource.data.vehicle in ['bike', 'erickshaw', 'auto', 'pickup', 'tractor', 'truck']
+        && filledText(request.resource.data.areas, 200)
+        && filledText(request.resource.data.charges, 150)
+        && request.resource.data.available is bool
+        && request.resource.data.updatedAt is number;
+    }
+
+    // ---------- shops ----------
+    match /shops/{uid} {
+      allow read: if true;
+      allow delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && myRole() == 'shop'
+        && request.resource.data.keys().hasOnly(['shopName', 'name', 'village', 'district', 'state', 'about', 'products', 'updatedAt'])
+        && place(request.resource.data)
+        && filledText(request.resource.data.shopName, 80)
+        && shortText(request.resource.data.about, 300)
+        && request.resource.data.products is list && request.resource.data.products.size() <= 40
+        && request.resource.data.updatedAt is number;
+    }
+
+    // ---------- version 1 data ("listings" and "farms") ----------
+    // Kept in the database (you can still see it in the Firebase console), but the new
+    // website does not use it. Locked, because it has phone numbers that were public.
+    match /listings/{id} { allow read, write: if false; }
+    match /farms/{id} { allow read, write: if false; }
+  }
+}
